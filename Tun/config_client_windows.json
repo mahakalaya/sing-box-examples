@@ -9,14 +9,14 @@
                 "tag": "dns_proxy",
                 "address": "https://1.1.1.1/dns-query",
                 "address_resolver": "dns_resolver",
-                "strategy": "ipv4_only", // 若服务端准备好了IPv6，可改为 prefer_ipv6
+                "strategy": "ipv4_only", // 若两端准备好了IPv6，可改为 "prefer_ipv6"
                 "detour": "proxy"
             },
             {
                 "tag": "dns_direct",
                 "address": "h3://dns.alidns.com/dns-query",
                 "address_resolver": "dns_resolver",
-                "strategy": "ipv4_only", // 若客户端准备好了IPv6，可改为 prefer_ipv6
+                "strategy": "ipv4_only", // 若两端准备好了IPv6，可改为 "prefer_ipv6"
                 "detour": "direct"
             },
             {
@@ -49,15 +49,9 @@
                     "geolocation-!cn"
                 ],
                 "server": "dns_proxy"
-            },
-            {
-                "geosite": [
-                    "cn",
-                    "private"
-                ],
-                "server": "dns_direct"
             }
-        ]
+        ],
+        "final": "dns_direct"
     },
     "route": {
         "geoip": {
@@ -85,45 +79,10 @@
                 "outbound": "direct"
             },
             {
-                "protocol": [
-                    "quic"
-                ],
-                "outbound": "block"
-            },
-            {
-                "type": "logical",
-                "mode": "and",
-                "rules": [
-                    {
-                        "geosite": [
-                            "geolocation-!cn"
-                        ]
-                    },
-                    {
-                        "geoip": [
-                            "cn"
-                        ],
-                        "invert": true
-                    }
+                "geosite": [
+                    "geolocation-!cn"
                 ],
                 "outbound": "proxy"
-            },
-            {
-                "type": "logical",
-                "mode": "and",
-                "rules": [
-                    {
-                        "geosite": [
-                            "cn"
-                        ]
-                    },
-                    {
-                        "geoip": [
-                            "cn"
-                        ]
-                    }
-                ],
-                "outbound": "direct"
             },
             {
                 "geosite": [
@@ -139,6 +98,7 @@
                 "outbound": "direct"
             }
         ],
+        "final": "proxy",
         "auto_detect_interface": true
     },
     "inbounds": [
@@ -149,7 +109,7 @@
             "inet6_address": "fdfe:dcba:9876::1/126",
             "auto_route": true,
             "strict_route": true,
-            "stack": "system",
+            "stack": "mixed",
             "sniff": true,
             "sniff_override_destination": false
         }

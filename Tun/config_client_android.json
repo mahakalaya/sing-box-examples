@@ -9,14 +9,14 @@
                 "tag": "dns_proxy",
                 "address": "https://1.1.1.1/dns-query",
                 "address_resolver": "dns_resolver",
-                "strategy": "ipv4_only", // 若服务端准备好了IPv6，可改为 prefer_ipv6
+                "strategy": "ipv4_only", // 若两端准备好了IPv6，可改为 "prefer_ipv6"
                 "detour": "proxy"
             },
             {
                 "tag": "dns_direct",
                 "address": "h3://dns.alidns.com/dns-query",
                 "address_resolver": "dns_resolver",
-                "strategy": "ipv4_only", // 若客户端准备好了IPv6，可改为 prefer_ipv6
+                "strategy": "ipv4_only", // 若两端准备好了IPv6，可改为 "prefer_ipv6"
                 "detour": "direct"
             },
             {
@@ -49,15 +49,9 @@
                     "geolocation-!cn"
                 ],
                 "server": "dns_proxy"
-            },
-            {
-                "geosite": [
-                    "cn",
-                    "private"
-                ],
-                "server": "dns_direct"
             }
-        ]
+        ],
+        "final": "dns_direct"
     },
     "route": {
         "geoip": {
@@ -74,45 +68,10 @@
                 "outbound": "dns-out"
             },
             {
-                "protocol": [
-                    "quic"
-                ],
-                "outbound": "block"
-            },
-            {
-                "type": "logical",
-                "mode": "and",
-                "rules": [
-                    {
-                        "geosite": [
-                            "geolocation-!cn"
-                        ]
-                    },
-                    {
-                        "geoip": [
-                            "cn"
-                        ],
-                        "invert": true
-                    }
+                "geosite": [
+                    "geolocation-!cn"
                 ],
                 "outbound": "proxy"
-            },
-            {
-                "type": "logical",
-                "mode": "and",
-                "rules": [
-                    {
-                        "geosite": [
-                            "cn"
-                        ]
-                    },
-                    {
-                        "geoip": [
-                            "cn"
-                        ]
-                    }
-                ],
-                "outbound": "direct"
             },
             {
                 "geosite": [
@@ -128,6 +87,7 @@
                 "outbound": "direct"
             }
         ],
+        "final": "proxy",
         "auto_detect_interface": true
     },
     "inbounds": [
@@ -136,19 +96,11 @@
             "tag": "tun-in",
             "inet4_address": "172.19.0.1/30",
             "inet6_address": "fdfe:dcba:9876::1/126",
-            "mtu": 1400,
             "auto_route": true,
             "strict_route": true,
-            "stack": "gvisor",
+            "stack": "mixed",
             "sniff": true,
-            "sniff_override_destination": false,
-            "include_package": [ // 代理的 Android 应用包名，应用包名可使用 LibCheck 查看，若不写 "include_package" 表示代理全部应用
-                "com.google.android.gms",
-                "com.google.android.gsf",
-                "com.android.vending",
-                "com.android.chrome",
-                "org.telegram.messenger"
-            ]
+            "sniff_override_destination": false
         }
     ],
     "outbounds": [
