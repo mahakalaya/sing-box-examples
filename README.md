@@ -1,6 +1,6 @@
 # [TCP Brutal](https://github.com/apernet/tcp-brutal) 使用指南
 
-**Brutal**： 这是 Hysteria 自有的拥塞控制算法。与 BBR 不同，Brutal 采用固定速率模型，丢包或 RTT 变化不会降低速度。相反，如果无法达到预定的目标速率，反而会根据计算的丢包率提高发送速率来进行补偿。Brutal 只在你知道（并正确设置了）当前网络的最大速度时才能正常运行。其擅长在拥塞的网络中抢占带宽，因此得名。
+**[Brutal](https://hysteria.network/zh/docs/advanced/Full-Server-Config/#_6)：** 这是 [Hysteria](https://github.com/apernet/hysteria) 自有的拥塞控制算法。与 BBR 不同，Brutal 采用固定速率模型，丢包或 RTT 变化不会降低速度。相反，如果无法达到预定的目标速率，反而会根据计算的丢包率提高发送速率来进行补偿。Brutal 只在你知道（并正确设置了）当前网络的最大速度时才能正常运行。其擅长在拥塞的网络中抢占带宽，因此得名。
 
 > Brutal 如果带宽设置低于实际最大值也能正常运行；相当于限速。重要的是不要将其设置得高于实际最大值，否则会因为补偿机制导致连接速度慢、不稳定，且浪费流量。
 
@@ -10,24 +10,34 @@
 
 ## 服务端安装 [TCP Brutal](https://github.com/apernet/tcp-brutal/blob/master/README.zh.md#%E7%94%A8%E6%88%B7%E6%8C%87%E5%8D%97)
 
+安装脚本：
+
+```
+bash <(curl -fsSL https://tcp.hy2.sh/)
+```
+
+> 需要内核版本 5.8 或更高。
+
 ## 客户端配置
 
 ```jsonc
             "multiplex": {
                 "enabled": true,
-                "protocol": "h2mux", // smux / yamux / h2mux
-                "max_connections": 1, // 必须为 1
+                "protocol": "h2mux", // 默认 h2mux，可选 smux | yamux | h2mux
+                "max_connections": 1, // 建议为 1
                 "min_streams": 4,
-                "padding": true, // false / true
+                "padding": false, // 默认 false，可选 false | true
                 "brutal": {
                     "enabled": true,
-                    "up_mbps": 50,
-                    "down_mbps": 1000
+                    "up_mbps": 20,
+                    "down_mbps": 100
                 }
             }
 ```
 
-**支持的：[ShadowTLS](ShadowTLS) / [Shadowsocks](Shadowsocks) / [Trojan](Trojan) / [VLESS](VLESS-XTLS-Vision) / [VLESS-REALITY](VLESS-XTLS-uTLS-REALITY) / [VMess-WebSocket](VMess-WebSocket)**
+> 需要 sing-box 版本 1.7.0 或更高。
+
+**支持的：[ShadowTLS](ShadowTLS) | [Shadowsocks](Shadowsocks) | [Trojan](Trojan) | [VLESS](VLESS-XTLS-Vision) | [VLESS-REALITY](VLESS-XTLS-uTLS-REALITY) | [VMess-HTTPUpgrade-TLS](VMess-HTTPUpgrade-TLS) | [VMess-WebSocket-TLS](VMess-WebSocket-TLS) | [VMess-WebSocket](VMess-WebSocket) | [VMess](VMess)**
 
 1. **VLESS / VLESS-REALITY** 中 `"flow": ""` 必须留空
 
@@ -67,7 +77,7 @@
                 "protocol": "h2mux",
                 "max_connections": 1,
                 "min_streams": 4,
-                "padding": true,
+                "padding": false,
                 "brutal": {
                     "enabled": true,
                     "up_mbps": 50,
@@ -86,16 +96,19 @@
 ```jsonc
             "multiplex": {
                 "enabled": true,
-                "padding": true, // false / true
+                "padding": false,
                 "brutal": {
                     "enabled": true,
                     "up_mbps": 100, // 客户端的下行速率
-                    "down_mbps": 1000
+                    "down_mbps": 20
                 }
             }
 ```
 
-**支持的：[ShadowTLS](ShadowTLS) / [Shadowsocks](Shadowsocks) / [Trojan](Trojan) / [VLESS](VLESS-XTLS-Vision) / [VLESS-REALITY](VLESS-XTLS-uTLS-REALITY) / [VMess-WebSocket](VMess-WebSocket)**
+> 需要 sing-box 版本 1.7.0 或更高。<br>
+> 建议 `"up_mbps"` 填小一些，量力而行，不会有错
+
+**支持的：[ShadowTLS](ShadowTLS) | [Shadowsocks](Shadowsocks) | [Trojan](Trojan) | [VLESS](VLESS-XTLS-Vision) | [VLESS-REALITY](VLESS-XTLS-uTLS-REALITY) | [VMess-HTTPUpgrade-TLS](VMess-HTTPUpgrade-TLS) | [VMess-WebSocket-TLS](VMess-WebSocket-TLS) | [VMess-WebSocket](VMess-WebSocket) | [VMess](VMess)**
 
 1. **VLESS / VLESS-REALITY** 中 `"flow": ""` 必须留空
 
@@ -125,7 +138,7 @@
             },
             "multiplex": {
                 "enabled": true,
-                "padding": true,
+                "padding": false,
                 "brutal": {
                     "enabled": true,
                     "up_mbps": 100,
@@ -191,7 +204,7 @@ bash -c "$(curl -L https://sing-box.vercel.app)" @ remove
 1. 下载程序（**linux-amd64**）或 [编译程序](compile_sing-box.md)
 
 ```
-curl -Lo sing-box.tar.gz https://github.com/SagerNet/sing-box/releases/download/v1.6.2/sing-box-1.6.2-linux-amd64.tar.gz && tar -xzf sing-box.tar.gz && cp -f sing-box-*/sing-box . && rm -r sing-box.tar.gz sing-box-* && chown root:root sing-box && chmod +x sing-box && mv -f sing-box /usr/local/bin/
+curl -Lo sing-box.tar.gz https://github.com/SagerNet/sing-box/releases/latest/download/$(curl https://api.github.com/repos/SagerNet/sing-box/releases|grep -E '"name": "sing-box-.*-linux-amd64.tar.gz"'|grep -Pv '(alpha|beta|rc)'|sed -n 's/.*"name": "\(.*\)".*/\1/p'|head -1) && tar -xzf sing-box.tar.gz && cp -f sing-box-*/sing-box . && rm -r sing-box.tar.gz sing-box-* && chown root:root sing-box && chmod +x sing-box && mv -f sing-box /usr/local/bin/
 ```
 
 2. 上传配置、证书和私钥

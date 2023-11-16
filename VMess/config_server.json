@@ -1,11 +1,15 @@
 {
     "inbounds": [
         {
-            "type": "shadowsocks",
+            "type": "vmess",
             "listen": "::",
             "listen_port": 80,
-            "method": "2022-blake3-aes-128-gcm",
-            "password": "" // 执行 sing-box generate rand 16 --base64 生成
+            "users": [
+                {
+                    "uuid": "",
+                    "alterId": 0
+                }
+            ]
         }
     ],
     "outbounds": [
