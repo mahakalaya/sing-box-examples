@@ -1,161 +1,26 @@
-# [TCP Brutal](https://github.com/apernet/tcp-brutal) 使用指南
+## **配置介绍：** 
 
-**[Brutal](https://hysteria.network/zh/docs/advanced/Full-Server-Config/#_6)：** 这是 [Hysteria](https://github.com/apernet/hysteria) 自有的拥塞控制算法。与 BBR 不同，Brutal 采用固定速率模型，丢包或 RTT 变化不会降低速度。相反，如果无法达到预定的目标速率，反而会根据计算的丢包率提高发送速率来进行补偿。Brutal 只在你知道（并正确设置了）当前网络的最大速度时才能正常运行。其擅长在拥塞的网络中抢占带宽，因此得名。
+| | 传输层协议 | Multiplex | UDP over TCP | 拥塞控制算法 |
+| :--- | :---: | :---: | :---: | :---: |
+| **Hysteria** | UDP | 自带 |  | Brutal |
+| **Hysteria2** | UDP | 自带 |  | Brutal / BBR |
+| **Naive** | TCP | 自带 |  | |
+| **ShadowTLS** | TCP | 支持 | 支持 | TCP Brutal |
+| **Shadowsocks** | TCP | 支持 | 支持 | TCP Brutal |
+| **TUIC** | UDP | 自带 | udp_over_stream | BBR |
+| **Trojan** | TCP | 支持 | 自带 | TCP Brutal |
+| **VLESS-HTTP2-REALITY** | TCP | 自带 | 自带 |  |
+| **VLESS-Vision-REALITY** | TCP | 不支持 | 自带 |  |
+| **VLESS-REALITY** | TCP | 支持 | 自带 | TCP Brutal |
+| **VLESS-Vision-TLS** | TCP | 不支持 | 自带 |  |
+| **VLESS-TLS** | TCP | 支持 | 自带 | TCP Brutal |
+| **VLESS-gRPC-REALITY** | TCP | 自带 | 自带 |  |
+| **VLESS-gRPC-TLS** | TCP | 自带 | 自带 |  |
+| **VMess-HTTPUpgrade-TLS** | TCP | 支持 | 自带 | TCP Brutal |
+| **VMess-WebSocket-TLS** | TCP | 支持 | 自带 | TCP Brutal |
+| **VMess-WebSocket** | TCP | 支持 | 自带 | TCP Brutal |
+| **VMess** | TCP | 支持 | 自带 | TCP Brutal |
 
-> Brutal 如果带宽设置低于实际最大值也能正常运行；相当于限速。重要的是不要将其设置得高于实际最大值，否则会因为补偿机制导致连接速度慢、不稳定，且浪费流量。
-
-[Hysteria 是多倍发包吗？](https://hysteria.network/zh/docs/misc/Hysteria-Brutal/)
-
-[My response to the recent controversy about TCP Brutal](https://gist.github.com/tobyxdd/0993ac063b2eee94f7d36ddd786f52ce)
-
-## 服务端安装 [TCP Brutal](https://github.com/apernet/tcp-brutal/blob/master/README.zh.md#%E7%94%A8%E6%88%B7%E6%8C%87%E5%8D%97)
-
-安装脚本：
-
-```
-bash <(curl -fsSL https://tcp.hy2.sh/)
-```
-
-> 需要内核版本 5.8 或更高。
-
-## 客户端配置
-
-```jsonc
-            "multiplex": {
-                "enabled": true,
-                "protocol": "h2mux", // 默认 h2mux，可选 smux | yamux | h2mux
-                "max_connections": 1, // 建议为 1
-                "min_streams": 4,
-                "padding": false, // 默认 false，可选 false | true
-                "brutal": {
-                    "enabled": true,
-                    "up_mbps": 20,
-                    "down_mbps": 100
-                }
-            }
-```
-
-> 需要 sing-box 版本 1.7.0 或更高。
-
-**支持的：[ShadowTLS](ShadowTLS) | [Shadowsocks](Shadowsocks) | [Trojan](Trojan) | [VLESS](VLESS-XTLS-Vision) | [VLESS-REALITY](VLESS-XTLS-uTLS-REALITY) | [VMess-HTTPUpgrade-TLS](VMess-HTTPUpgrade-TLS) | [VMess-WebSocket-TLS](VMess-WebSocket-TLS) | [VMess-WebSocket](VMess-WebSocket) | [VMess](VMess)**
-
-1. **VLESS / VLESS-REALITY** 中 `"flow": ""` 必须留空
-
-2. 两端 **"padding"** 必须一致
-
-3. **"up_mbps" / "down_mbps"** 必填，不会生效
-
-<details> <summary>示例配置</summary>
-
-```jsonc
-{
-    "inbounds": [
-        {
-            "type": "mixed",
-            "listen": "::",
-            "listen_port": 10000
-        }
-    ],
-    "outbounds": [
-        {
-            "type": "vless",
-            "server": "233.33.33.33",
-            "server_port": 443,
-            "uuid": "chika",
-            "flow": "",
-            "tls": {
-                "enabled": true,
-                "server_name": "www.lovelive-anime.jp",
-                "utls": {
-                    "enabled": true,
-                    "fingerprint": "chrome"
-                }
-             },
-            "packet_encoding": "xudp",
-            "multiplex": {
-                "enabled": true,
-                "protocol": "h2mux",
-                "max_connections": 1,
-                "min_streams": 4,
-                "padding": false,
-                "brutal": {
-                    "enabled": true,
-                    "up_mbps": 50,
-                    "down_mbps": 1000
-                }
-            }
-        }
-    ]
-}
-```
-
-</details>
-
-## 服务端配置
-
-```jsonc
-            "multiplex": {
-                "enabled": true,
-                "padding": false,
-                "brutal": {
-                    "enabled": true,
-                    "up_mbps": 100, // 客户端的下行速率
-                    "down_mbps": 20
-                }
-            }
-```
-
-> 需要 sing-box 版本 1.7.0 或更高。<br>
-> 建议 `"up_mbps"` 填小一些，量力而行，不会有错
-
-**支持的：[ShadowTLS](ShadowTLS) | [Shadowsocks](Shadowsocks) | [Trojan](Trojan) | [VLESS](VLESS-XTLS-Vision) | [VLESS-REALITY](VLESS-XTLS-uTLS-REALITY) | [VMess-HTTPUpgrade-TLS](VMess-HTTPUpgrade-TLS) | [VMess-WebSocket-TLS](VMess-WebSocket-TLS) | [VMess-WebSocket](VMess-WebSocket) | [VMess](VMess)**
-
-1. **VLESS / VLESS-REALITY** 中 `"flow": ""` 必须留空
-
-2. 两端 **"padding"** 必须一致
-
-3. **"up_mbps" / "down_mbps"** 必填，**"down_mbps"** 不会生效
-
-<details> <summary>示例配置</summary>
-
-```jsonc
-{
-    "inbounds": [
-        {
-            "type": "vless",
-            "listen": "::",
-            "listen_port": 443,
-            "users": [
-                {
-                    "uuid": "chika",
-                    "flow": ""
-                }
-            ],
-            "tls": {
-                "enabled": true,
-                "certificate_path": "/root/fullchain.cer",
-                "key_path": "/root/private.key"
-            },
-            "multiplex": {
-                "enabled": true,
-                "padding": false,
-                "brutal": {
-                    "enabled": true,
-                    "up_mbps": 100,
-                    "down_mbps": 1000
-                }
-            }
-        }
-    ],
-    "outbounds": [
-        {
-            "type": "direct"
-        }
-    ]
-}
-```
-
-</details>
 
 # [sing-box](https://github.com/SagerNet/sing-box) 安装指南
 
