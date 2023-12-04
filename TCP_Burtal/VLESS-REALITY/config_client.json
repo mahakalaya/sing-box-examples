@@ -18,8 +18,13 @@
                 "utls": {
                     "enabled": true,
                     "fingerprint": "chrome"
+                },
+                "reality": {
+                    "enabled": true,
+                    "public_key": "",
+                    "short_id": ""
                 }
-             },
+            },
             "packet_encoding": "xudp",
             "multiplex": {
                 "enabled": true,
@@ -32,7 +37,8 @@
                     "up_mbps": 20,
                     "down_mbps": 100
                 }
-            }
+            },
+            "tcp_multi_path": true
         }
     ]
 }

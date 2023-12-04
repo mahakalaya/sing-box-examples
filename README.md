@@ -1,26 +1,41 @@
 ## **配置介绍：** 
 
-| | 传输层协议 | Multiplex | UDP over TCP | 拥塞控制算法 |
-| :--- | :---: | :---: | :---: | :---: |
-| **Hysteria** | UDP | 自带 |  | Brutal |
-| **Hysteria2** | UDP | 自带 |  | Brutal / BBR |
-| **Naive** | TCP | 自带 |  | |
-| **ShadowTLS** | TCP | 支持 | 支持 | TCP Brutal |
-| **Shadowsocks** | TCP | 支持 | 支持 | TCP Brutal |
-| **TUIC** | UDP | 自带 | udp_over_stream | BBR |
-| **Trojan** | TCP | 支持 | 自带 | TCP Brutal |
-| **VLESS-HTTP2-REALITY** | TCP | 自带 | 自带 |  |
-| **VLESS-Vision-REALITY** | TCP | 不支持 | 自带 |  |
-| **VLESS-REALITY** | TCP | 支持 | 自带 | TCP Brutal |
-| **VLESS-Vision-TLS** | TCP | 不支持 | 自带 |  |
-| **VLESS-TLS** | TCP | 支持 | 自带 | TCP Brutal |
-| **VLESS-gRPC-REALITY** | TCP | 自带 | 自带 |  |
-| **VLESS-gRPC-TLS** | TCP | 自带 | 自带 |  |
-| **VMess-HTTPUpgrade-TLS** | TCP | 支持 | 自带 | TCP Brutal |
-| **VMess-WebSocket-TLS** | TCP | 支持 | 自带 | TCP Brutal |
-| **VMess-WebSocket** | TCP | 支持 | 自带 | TCP Brutal |
-| **VMess** | TCP | 支持 | 自带 | TCP Brutal |
+### 基于 TCP 的代理协议
 
+| | Multiplex | UDP over TCP | TCP Brutal | MPTCP |
+| :--- | :---: | :---: | :---: | :---: |
+| [**ShadowTLS**](ShadowTLS) | 支持 | 支持 | :heavy_check_mark: | :heavy_check_mark: |
+| [**Shadowsocks**](Shadowsocks) | 支持 | 支持 | :heavy_check_mark: | :heavy_check_mark: |
+| [**Trojan**](Trojan) | 支持 | 自带 | :heavy_check_mark: | :heavy_check_mark: |
+| [**VLESS-HTTP2-REALITY**](VLESS-HTTP2-REALITY) | 自带 | 自带 | :x: | :heavy_check_mark: |
+| [**VLESS-Vision-REALITY**](VLESS-Vision-REALITY) | 不支持 | 自带 | :x: | :heavy_check_mark: |
+| [**VLESS-REALITY**](TCP_Burtal/VLESS-REALITY) | 支持 | 自带 | :heavy_check_mark: | :heavy_check_mark: |
+| [**VLESS-Vision-TLS**](VLESS-Vision-TLS) | 不支持 | 自带 | :x: | :heavy_check_mark: |
+| [**VLESS-TLS**](TCP_Burtal/VLESS-TLS) | 支持 | 自带 | :heavy_check_mark: | :heavy_check_mark: |
+| [**VLESS-gRPC-REALITY**](VLESS-gRPC-REALITY) | 自带 | 自带 | :x: | :heavy_check_mark: |
+| [**VLESS-gRPC-TLS**](VLESS-gRPC-TLS) | 自带 | 自带 | :x: | :heavy_check_mark: |
+| [**VMess-HTTPUpgrade-TLS**](VMess-HTTPUpgrade-TLS) | 支持 | 自带 | :heavy_check_mark: | :heavy_check_mark: |
+| [**VMess-WebSocket-TLS**](VMess-WebSocket-TLS) | 支持 | 自带 | :heavy_check_mark: | :heavy_check_mark: |
+| [**VMess-WebSocket**](VMess-WebSocket) | 支持 | 自带 | :heavy_check_mark: | :heavy_check_mark: |
+| [**VMess**](VMess) | 支持 | 自带 | :heavy_check_mark: | :heavy_check_mark: |
+
+[**TCP Brutal 使用指南**](TCP_Burtal#readme)
+
+[MPTCP](https://en.wikipedia.org/wiki/Multipath_TCP) 使用指南
+
+```jsonc
+            "tcp_multi_path": true
+```
+
+> MPTCP 配置需在[客户端](TCP_Burtal/VLESS-TLS/config_client.json#L36)，[服务端](TCP_Burtal/VLESS-TLS/config_server.json#L26)同时启用<br>
+
+### 基于 UDP 的代理协议
+
+| | Multiplex | UDP relay mode | 拥塞控制算法 |
+| :--- | :---: | :---: | :---: |
+| [**Hysteria**](Hysteria) | 自带 | native | Brutal |
+| [**Hysteria2**](Hysteria2) | 自带 | native | Brutal / BBR |
+| [**TUIC**](TUIC) | 自带 | native / quic / udp_over_stream | BBR / New Reno / Cubic |
 
 # [sing-box](https://github.com/SagerNet/sing-box) 安装指南
 

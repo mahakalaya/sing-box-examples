@@ -19,6 +19,9 @@
                     "enabled": true,
                     "fingerprint": "chrome"
                 }
+            },
+            "multiplex": {
+                "enabled": true
             }
         }
     ]
