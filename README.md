@@ -8,10 +8,8 @@
 | [**Shadowsocks**](Shadowsocks) | 支持 | 支持 | :heavy_check_mark: | :heavy_check_mark: |
 | [**Trojan**](Trojan) | 支持 | 自带 | :heavy_check_mark: | :heavy_check_mark: |
 | [**VLESS-HTTP2-REALITY**](VLESS-HTTP2-REALITY) | 自带 | 自带 | :x: | :heavy_check_mark: |
-| [**VLESS-Vision-REALITY**](VLESS-Vision-REALITY) | 不支持 | 自带 | :x: | :heavy_check_mark: |
-| [**VLESS-REALITY**](TCP_Burtal/VLESS-REALITY) | 支持 | 自带 | :heavy_check_mark: | :heavy_check_mark: |
-| [**VLESS-Vision-TLS**](VLESS-Vision-TLS) | 不支持 | 自带 | :x: | :heavy_check_mark: |
-| [**VLESS-TLS**](TCP_Burtal/VLESS-TLS) | 支持 | 自带 | :heavy_check_mark: | :heavy_check_mark: |
+| [**VLESS-Vision-REALITY**](VLESS-Vision-REALITY) | 不支持 | 自带 | :heavy_check_mark: **1** | :heavy_check_mark: |
+| [**VLESS-Vision-TLS**](VLESS-Vision-TLS) | 不支持 | 自带 | :heavy_check_mark: **1** | :heavy_check_mark: |
 | [**VLESS-gRPC-REALITY**](VLESS-gRPC-REALITY) | 自带 | 自带 | :x: | :heavy_check_mark: |
 | [**VLESS-gRPC-TLS**](VLESS-gRPC-TLS) | 自带 | 自带 | :x: | :heavy_check_mark: |
 | [**VMess-HTTPUpgrade-TLS**](VMess-HTTPUpgrade-TLS) | 支持 | 自带 | :heavy_check_mark: | :heavy_check_mark: |
@@ -19,15 +17,15 @@
 | [**VMess-WebSocket**](VMess-WebSocket) | 支持 | 自带 | :heavy_check_mark: | :heavy_check_mark: |
 | [**VMess**](VMess) | 支持 | 自带 | :heavy_check_mark: | :heavy_check_mark: |
 
+**1：** `"flow": ""` 必须留空，或不写 `"flow": ""`
+
 [**TCP Brutal 使用指南**](TCP_Burtal#readme)
 
-[MPTCP](https://en.wikipedia.org/wiki/Multipath_TCP) 使用指南
+> TCP Brutal 配置需在[客户端](TCP_Burtal/config_client.json#L24-L35)，[服务端](TCP_Burtal/config_server.json#L17-L25)同时启用
 
-```jsonc
-            "tcp_multi_path": true
-```
+**MPTCP 使用指南**
 
-> MPTCP 配置需在[客户端](TCP_Burtal/VLESS-TLS/config_client.json#L36)，[服务端](TCP_Burtal/VLESS-TLS/config_server.json#L26)同时启用<br>
+> MPTCP 配置需在[客户端](TCP_Burtal/config_client.json#L36)，[服务端](TCP_Burtal/config_server.json#L26)同时启用
 
 ### 基于 UDP 的代理协议
 
