@@ -24,11 +24,6 @@
                 "address": "rcode://refused"
             },
             {
-                "tag": "dns_fakeip",
-                "address": "fakeip",
-                "strategy": "ipv4_only"
-            },
-            {
                 "tag": "dns_resolver",
                 "address": "223.5.5.5",
                 "strategy": "ipv4_only",
@@ -42,24 +37,10 @@
             },
             {
                 "rule_set": "geosite-geolocation-!cn",
-                "query_type": [
-                    "A",
-                    "AAAA"
-                ],
-                "server": "dns_fakeip"
-            },
-            {
-                "rule_set": "geosite-geolocation-!cn",
                 "server": "dns_proxy"
             }
         ],
-        "final": "dns_direct",
-        "independent_cache": true,
-        "fakeip": {
-            "enabled": true,
-            "inet4_range": "198.18.0.0/15",
-            "inet6_range": "fc00::/18"
-        }
+        "final": "dns_direct"
     },
     "route": {
         "rule_set": [
@@ -93,6 +74,7 @@
             {
                 "process_name": [
                     "xray.exe",
+                    "sing-box.exe",
                     "IDMan.exe"
                 ],
                 "outbound": "direct"
@@ -160,8 +142,7 @@
     "experimental": {
         "cache_file": {
             "enabled": true,
-            "path": "cache.db",
-            "store_fakeip": true
+            "path": "cache.db"
         }
     }
 }
