@@ -14,7 +14,7 @@
             },
             {
                 "tag": "dns_direct",
-                "address": "h3://dns.alidns.com/dns-query",
+                "address": "https://dns.alidns.com/dns-query",
                 "address_resolver": "dns_resolver",
                 "strategy": "ipv4_only",
                 "detour": "direct"
@@ -39,11 +39,6 @@
             {
                 "outbound": "any",
                 "server": "dns_resolver"
-            },
-            {
-                "rule_set": "geosite-category-ads-all",
-                "server": "dns_block",
-                "disable_cache": true
             },
             {
                 "rule_set": "geosite-geolocation-!cn",
@@ -76,13 +71,6 @@
     },
     "route": {
         "rule_set": [
-            {
-                "tag": "geosite-category-ads-all",
-                "type": "remote",
-                "format": "binary",
-                "url": "https://raw.githubusercontent.com/SagerNet/sing-geosite/rule-set/geosite-category-ads-all.srs",
-                "download_detour": "proxy"
-            },
             {
                 "tag": "geosite-geolocation-!cn",
                 "type": "remote",
@@ -129,22 +117,19 @@
                 "outbound": "proxy"
             },
             {
-                "type": "logical",
-                "mode": "or",
-                "rules": [
-                    {
-                        "rule_set": "geosite-cn"
-                    },
-                    {
-                        "rule_set": "geosite-category-companies@cn"
-                    },
-                    {
-                        "rule_set": "geoip-cn"
-                    },
-                    {
-                        "ip_is_private": true
-                    }
-                ],
+                "rule_set": "geosite-cn",
+                "outbound": "direct"
+            },
+            {
+                "rule_set": "geosite-category-companies@cn",
+                "outbound": "direct"
+            },
+            {
+                "rule_set": "geoip-cn",
+                "outbound": "direct"
+            },
+            {
+                "ip_is_private": true,
                 "outbound": "direct"
             }
         ],
@@ -155,8 +140,8 @@
         {
             "type": "tun",
             "tag": "tun-in",
-            "inet4_address": "172.16.0.1/24",
-            "inet6_address": "fd00::1/64",
+            "inet4_address": "172.16.0.1/30",
+            "inet6_address": "fd00::1/126",
             "mtu": 1400,
             "auto_route": true,
             "strict_route": true,
@@ -183,13 +168,6 @@
             "tag": "dns-out"
         }
     ],
-    "ntp": {
-        "enabled": true,
-        "server": "time.apple.com",
-        "server_port": 123,
-        "interval": "30m",
-        "detour": "direct"
-    },
     "experimental": {
         "cache_file": {
             "enabled": true,
