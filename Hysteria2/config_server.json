@@ -3,13 +3,9 @@
         {
             "type": "hysteria2",
             "listen": "::",
-<<<<<<< HEAD
             "listen_port": 20443,
-=======
-            "listen_port": 443,
             "up_mbps": 100,
             "down_mbps": 20,
->>>>>>> upstream/main
             "users": [
                 {
                     "password": "78465922"
