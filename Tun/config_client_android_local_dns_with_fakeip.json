@@ -1,7 +1,7 @@
 {
     "log": {
-        "level": "info",
-        "timestamp": true
+        "level": "warn",
+        "timestamp": false
     },
     "dns": {
         "servers": [
@@ -16,12 +16,16 @@
                 "tag": "dns_direct",
                 "address": "https://dns.alidns.com/dns-query",
                 "address_resolver": "dns_resolver",
-                "strategy": "ipv4_only",
+                "strategy": "prefer_ipv6",
                 "detour": "direct"
             },
             {
-                "tag": "dns_block",
+                "tag": "dns_success",
                 "address": "rcode://success"
+            },
+            {
+                "tag": "dns_refused",
+                "address": "rcode://refused"
             },
             {
                 "tag": "dns_resolver",
@@ -41,6 +45,20 @@
                 "server": "dns_resolver"
             },
             {
+                "rule_set": "BlockHttpDNS",
+                "rule_set": "geosite-category-ads-all",
+                "domain_suffix": [
+                    "mcdn.bilivideo.cn",
+                    "szbdyd.com"
+                ],
+                "domain_regex": [
+                    "cn-[a-zA-Z0-9-]+\\.bilivideo\\.com",
+                    "[a-zA-Z0-9-]+-pcdn-[a-zA-Z0-9-]+\\.biliapi\\.net"
+                ],
+                "server": "dns_success",
+                "disable_cache": true
+            },
+            {
                 "rule_set": "geosite-geolocation-!cn",
                 "query_type": [
                     "A",
@@ -50,18 +68,23 @@
             },
             {
                 "rule_set": "geosite-geolocation-!cn",
+                "query_type": [
+                    "CNAME"
+                ],
                 "server": "dns_proxy"
             },
             {
-                "rule_set": "geosite-cn",
-                "server": "dns_direct"
-            },
-            {
-                "rule_set": "geosite-category-companies@cn",
-                "server": "dns_direct"
+                "query_type": [
+                    "A",
+                    "AAAA",
+                    "CNAME"
+                ],
+                "invert": true,
+                "server": "dns_refused",
+                "disable_cache": true
             }
         ],
-        "final": "dns_proxy",
+        "final": "dns_direct",
         "independent_cache": true,
         "fakeip": {
             "enabled": true,
@@ -71,6 +94,20 @@
     },
     "route": {
         "rule_set": [
+            {
+                "tag": "BlockHttpDNS",
+                "type": "remote",
+                "format": "binary",
+                "url": "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/sing/bm7/BlockHttpDNS.srs",
+                "download_detour": "proxy"
+            },
+            {
+                "tag": "geosite-category-ads-all",
+                "type": "remote",
+                "format": "binary",
+                "url": "https://raw.githubusercontent.com/SagerNet/sing-geosite/rule-set/geosite-category-ads-all.srs",
+                "download_detour": "proxy"
+            },
             {
                 "tag": "geosite-geolocation-!cn",
                 "type": "remote",
@@ -84,20 +121,6 @@
                 "format": "binary",
                 "url": "https://raw.githubusercontent.com/SagerNet/sing-geoip/rule-set/geoip-cn.srs",
                 "download_detour": "proxy"
-            },
-            {
-                "tag": "geosite-cn",
-                "type": "remote",
-                "format": "binary",
-                "url": "https://raw.githubusercontent.com/SagerNet/sing-geosite/rule-set/geosite-cn.srs",
-                "download_detour": "proxy"
-            },
-            {
-                "tag": "geosite-category-companies@cn",
-                "type": "remote",
-                "format": "binary",
-                "url": "https://raw.githubusercontent.com/SagerNet/sing-geosite/rule-set/geosite-category-companies@cn.srs",
-                "download_detour": "proxy"
             }
         ],
         "rules": [
@@ -106,31 +129,39 @@
                 "outbound": "dns-out"
             },
             {
-                "protocol": [
-                    "quic",
-                    "stun"
+                "type": "logical",
+                "mode": "or",
+                "rules": [
+                    {
+                        "network": "tcp",
+                        "port": 853
+                    },
+                    {
+                        "network": "udp",
+                        "port": 443
+                    },
+                    {
+                        "protocol": "stun"
+                    }
+                ],
+                "outbound": "block"
+            },
+            {
+                "rule_set": "BlockHttpDNS",
+                "rule_set": "geosite-category-ads-all",
+                "domain_suffix": [
+                    "mcdn.bilivideo.cn",
+                    "szbdyd.com"
+                ],
+                "domain_regex": [
+                    "cn-[a-zA-Z0-9-]+\\.bilivideo\\.com",
+                    "[a-zA-Z0-9-]+-pcdn-[a-zA-Z0-9-]+\\.biliapi\\.net"
                 ],
                 "outbound": "block"
             },
             {
                 "rule_set": "geosite-geolocation-!cn",
                 "outbound": "proxy"
-            },
-            {
-                "type": "logical",
-                "mode": "and",
-                "rules": [
-                    {
-                        "rule_set": "geoip-cn"
-                    },
-                    {
-                        "rule_set": [
-                            "geosite-cn",
-                            "geosite-category-companies@cn"
-                        ]
-                    }
-                ],
-                "outbound": "direct"
             },
             {
                 "rule_set": "geoip-cn",
@@ -151,6 +182,7 @@
             "inet4_address": "172.16.0.1/30",
             "inet6_address": "fd00::1/126",
             "mtu": 1400,
+            "gso": true,
             "auto_route": true,
             "strict_route": true,
             "stack": "system",
