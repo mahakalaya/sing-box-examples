@@ -16,7 +16,12 @@
                 "tag": "dns_direct",
                 "address": "https://dns.alidns.com/dns-query",
                 "address_resolver": "dns_resolver",
-                "strategy": "prefer_ipv6",
+                "strategy": "ipv4_only",
+                "detour": "direct"
+            },
+            {
+                "tag": "dns_resolver",
+                "address": "223.5.5.5",
                 "detour": "direct"
             },
             {
@@ -28,15 +33,8 @@
                 "address": "rcode://refused"
             },
             {
-                "tag": "dns_resolver",
-                "address": "223.5.5.5",
-                "strategy": "ipv4_only",
-                "detour": "direct"
-            },
-            {
                 "tag": "dns_fakeip",
-                "address": "fakeip",
-                "strategy": "ipv4_only"
+                "address": "fakeip"
             }
         ],
         "rules": [
@@ -164,10 +162,9 @@
             "inet4_address": "172.16.0.1/30",
             "inet6_address": "fd00::1/126",
             "mtu": 1400,
-            "gso": true,
             "auto_route": true,
             "strict_route": true,
-            "stack": "system",
+            "stack": "gvisor",
             "sniff": true,
             "sniff_override_destination": false
         }
