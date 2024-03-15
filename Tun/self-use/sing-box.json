@@ -1,13 +1,13 @@
 {
     "log": {
-        "level": "warn",
-        "timestamp": false
+        "level": "info",
+        "timestamp": true
     },
     "dns": {
         "servers": [
             {
                 "tag": "dns_proxy",
-                "address": "https://1.1.1.1/dns-query",
+                "address": "https://8.8.8.8/dns-query",
                 "address_resolver": "dns_resolver",
                 "strategy": "ipv4_only",
                 "detour": "proxy"
@@ -43,8 +43,9 @@
                 "server": "dns_resolver"
             },
             {
-                "rule_set": "BlockHttpDNS",
-                "rule_set": "geosite-category-ads-all",
+                "domain": [
+                    "httpdns.bilivideo.com"
+                ],
                 "domain_suffix": [
                     ".mcdn.bilivideo.cn",
                     ".szbdyd.com"
@@ -93,20 +94,6 @@
     "route": {
         "rule_set": [
             {
-                "tag": "BlockHttpDNS",
-                "type": "remote",
-                "format": "binary",
-                "url": "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/sing/bm7/BlockHttpDNS.srs",
-                "download_detour": "proxy"
-            },
-            {
-                "tag": "geosite-category-ads-all",
-                "type": "remote",
-                "format": "binary",
-                "url": "https://raw.githubusercontent.com/SagerNet/sing-geosite/rule-set/geosite-category-ads-all.srs",
-                "download_detour": "proxy"
-            },
-            {
                 "tag": "geosite-geolocation-!cn",
                 "type": "remote",
                 "format": "binary",
@@ -127,8 +114,29 @@
                 "outbound": "dns-out"
             },
             {
-                "rule_set": "BlockHttpDNS",
-                "rule_set": "geosite-category-ads-all",
+                "port": 853,
+                "network": "tcp",
+                "outbound": "block"
+            },
+            {
+                "port": [
+                    443,
+                    853
+                ],
+                "network": "udp",
+                "outbound": "block"
+            },
+            {
+                "process_name": [
+                    "xray.exe",
+                    "IDMan.exe"
+                ],
+                "outbound": "direct"
+            },
+            {
+                "domain": [
+                    "httpdns.bilivideo.com"
+                ],
                 "domain_suffix": [
                     ".mcdn.bilivideo.cn",
                     ".szbdyd.com"
@@ -142,6 +150,27 @@
             {
                 "rule_set": "geosite-geolocation-!cn",
                 "outbound": "proxy"
+            },
+            {
+                "ip_cidr": [
+                    "47.101.175.206/32",
+                    "47.100.123.169/32",
+                    "120.46.169.234/32",
+                    "121.36.72.124/32",
+                    "116.63.10.135/32",
+                    "122.9.7.134/32",
+                    "117.185.228.108/32",
+                    "117.144.238.29/32",
+                    "122.9.13.79/32",
+                    "122.9.15.129/32",
+                    "101.91.140.224/32",
+                    "101.91.140.124/32",
+                    "114.116.215.110/32",
+                    "116.63.10.31/32",
+                    "112.64.218.119/32",
+                    "112.65.200.117/32"
+                ],
+                "outbound": "block"
             },
             {
                 "rule_set": "geoip-cn",
@@ -161,18 +190,20 @@
             "tag": "tun-in",
             "inet4_address": "172.16.0.1/30",
             "inet6_address": "fd00::1/126",
-            "mtu": 1400,
+            "mtu": 1492,
             "auto_route": true,
             "strict_route": true,
-            "stack": "gvisor",
+            "stack": "system",
             "sniff": true,
             "sniff_override_destination": false
         }
     ],
     "outbounds": [
         {
-            // 粘贴你的客户端配置，需要保留 "tag": "proxy"
-            "tag": "proxy"
+            "type": "socks",
+            "tag": "proxy",
+            "server": "127.0.0.1",
+            "server_port": 10808
         },
         {
             "type": "direct",
